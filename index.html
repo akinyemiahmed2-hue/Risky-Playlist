@@ -3,141 +3,188 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Risky ✿</title>
+  <title>Risky</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
 
   <style>
     :root{
+      --bg:#07060a;
+      --bg2:#0c0812;
       --ink:#ffffff;
-      --muted: rgba(255,255,255,.70);
-
-      --bg0:#07060a;
-      --bg1:#120814;
-      --bg2:#1a0b1b;
+      --muted:rgba(255,255,255,.68);
 
       --pink:#ff4fa3;
-      --hot:#ff2d8f;
+      --pink2:#ff2d8f;
+      --white:rgba(255,255,255,.92);
 
-      --glass: rgba(255,255,255,.08);
-      --stroke: rgba(255,255,255,.14);
-      --stroke2: rgba(255,79,163,.18);
+      --card: rgba(255,255,255,.06);
+      --stroke: rgba(255,255,255,.12);
       --shadow: 0 28px 90px rgba(0,0,0,.55);
 
       --r: 26px;
+      --max: 980px;
       --sans: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      --script: "Great Vibes", cursive;
+      --serif: "Playfair Display", serif;
     }
 
     *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
     body{
       margin:0;
-      font-family: var(--sans);
       color:var(--ink);
+      font-family:var(--sans);
       background:
-        radial-gradient(900px 520px at 18% 18%, rgba(255,79,163,.18), transparent 60%),
-        radial-gradient(760px 620px at 78% 55%, rgba(255,255,255,.08), transparent 66%),
-        linear-gradient(180deg, var(--bg0) 0%, var(--bg1) 45%, var(--bg2) 100%);
+        radial-gradient(900px 520px at 16% 12%, rgba(255,79,163,.16), transparent 60%),
+        radial-gradient(820px 560px at 82% 40%, rgba(255,255,255,.07), transparent 66%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
       overflow-x:hidden;
     }
 
-    .floatLayer{position:fixed; inset:0; pointer-events:none; z-index:0; opacity:.9;}
-    .float{position:absolute; font-size:18px; animation: drift 12s ease-in-out infinite; filter: drop-shadow(0 10px 18px rgba(0,0,0,.35));}
-    .float:nth-child(2){animation-duration:14s}
-    .float:nth-child(3){animation-duration:16s}
-    .float:nth-child(4){animation-duration:13s}
-    .float:nth-child(5){animation-duration:15s}
-    @keyframes drift{0%{transform:translate(0,0) rotate(0)}50%{transform:translate(10px,-14px) rotate(6deg)}100%{transform:translate(0,0) rotate(0)}}
+    /* subtle “living” background */
+    .glow{
+      position:fixed; inset:-20%;
+      background:
+        radial-gradient(closest-side, rgba(255,79,163,.10), transparent 65%) 15% 18%/38% 38% no-repeat,
+        radial-gradient(closest-side, rgba(255,255,255,.06), transparent 70%) 78% 46%/42% 42% no-repeat;
+      filter: blur(24px);
+      animation: breathe 10s ease-in-out infinite;
+      pointer-events:none;
+      z-index:0;
+      opacity:.9;
+    }
+    @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
 
     .wrap{
       position:relative;
       z-index:1;
-      width:min(980px, 92vw);
-      margin: 0 auto;
-      padding: 46px 0 72px;
-      display:flex;
-      flex-direction:column;
-      gap: 18px;
+      width:min(var(--max), 92vw);
+      margin:0 auto;
+      padding: 56px 0 70px;
     }
 
-    .hero{
-      background: var(--glass);
-      border: 1px solid var(--stroke2);
-      border-top-color: var(--stroke);
-      border-left-color: var(--stroke);
-      border-radius: var(--r);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(18px);
-      padding: 22px 18px;
+    header{
       text-align:center;
+      padding: 26px 18px 18px;
+      margin-bottom: 18px;
     }
-    .title{
-      font-family: var(--script);
-      font-size: clamp(52px, 7vw, 100px);
-      line-height: .92;
-      margin: 0;
+    .kicker{
+      display:inline-flex;
+      gap:10px;
+      align-items:center;
+      justify-content:center;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      color: rgba(255,255,255,.75);
+      font-size: 12px;
+      letter-spacing:.2px;
+    }
+    .dot{
+      width:7px; height:7px; border-radius:999px;
+      background: linear-gradient(180deg, var(--pink), var(--pink2));
+      box-shadow: 0 10px 26px rgba(255,79,163,.25);
+    }
+    h1{
+      font-family: var(--serif);
+      font-weight: 600;
+      font-size: clamp(44px, 7vw, 84px);
+      line-height: 1.02;
+      margin: 14px 0 10px;
       letter-spacing:.2px;
     }
     .sub{
-      margin: 10px auto 0;
+      margin:0 auto;
+      max-width: 62ch;
       color: var(--muted);
-      line-height: 1.6;
+      line-height: 1.65;
       font-size: 14px;
-      max-width: 60ch;
     }
 
-    .grid{
-      display:grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+    /* stacked cards */
+    .stack{
+      display:flex;
+      flex-direction:column;
       gap: 14px;
-    }
-    @media (max-width: 720px){
-      .grid{grid-template-columns: 1fr;}
-      .wrap{padding: 34px 0 60px;}
+      margin-top: 22px;
     }
 
     .card{
-      background: rgba(255,255,255,.07);
+      background: var(--card);
       border: 1px solid rgba(255,255,255,.10);
-      border-top-color: rgba(255,255,255,.16);
-      border-left-color: rgba(255,255,255,.16);
+      border-top-color: rgba(255,255,255,.14);
+      border-left-color: rgba(255,255,255,.14);
       border-radius: var(--r);
-      box-shadow: 0 22px 70px rgba(0,0,0,.35);
-      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
       overflow:hidden;
+      transform: translateY(12px);
+      opacity: 0;
+      transition: transform .6s ease, opacity .6s ease;
     }
-    .img{
-      width:100%;
-      aspect-ratio: 4/3;
-      object-fit: cover;
-      display:block;
-      background: rgba(255,255,255,.06);
-    }
-    .pad{padding: 14px 14px 16px;}
-    .song{
-      margin:0;
-      font-weight: 600;
-      font-size: 15px;
-      letter-spacing: .1px;
-    }
-    .artist{
-      margin: 4px 0 0;
-      color: var(--muted);
-      font-size: 13px;
-    }
-    .note{
-      margin: 10px 0 0;
-      color: rgba(255,255,255,.86);
-      font-size: 14px;
-      line-height: 1.55;
+    .card.show{
+      transform: translateY(0);
+      opacity: 1;
     }
 
-    .cta{
-      margin-top: 6px;
+    .media{
+      width:100%;
+      display:block;
+      aspect-ratio: 16/10;
+      object-fit: cover;
+      background: rgba(255,255,255,.04);
+    }
+
+    .meta{
+      padding: 16px 16px 18px;
+      display:flex;
+      flex-direction:column;
+      gap: 8px;
+    }
+
+    .row{
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap: 12px;
+      flex-wrap:wrap;
+    }
+
+    .song{
+      font-weight: 600;
+      font-size: 15px;
+      letter-spacing:.1px;
+      margin:0;
+    }
+    .artist{
+      margin:0;
+      color: rgba(255,255,255,.62);
+      font-size: 13px;
+    }
+
+    .note{
+      margin:0;
+      color: rgba(255,255,255,.85);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .tag{
+      font-size: 12px;
+      color: rgba(255,255,255,.70);
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      padding: 8px 10px;
+      border-radius: 999px;
+    }
+
+    .footer{
+      margin-top: 18px;
       display:flex;
       justify-content:center;
+      padding: 10px 0 0;
     }
     .btn{
       display:inline-flex;
@@ -146,73 +193,131 @@
       height: 48px;
       padding: 0 18px;
       border-radius: 14px;
-      background: linear-gradient(180deg, var(--pink), var(--hot));
+      background: linear-gradient(180deg, var(--pink), var(--pink2));
       color:#0b0710;
       text-decoration:none;
       font-weight: 700;
       font-size: 14px;
-      box-shadow: 0 18px 44px rgba(255,79,163,.18);
       border: 1px solid rgba(255,255,255,.18);
+      box-shadow: 0 18px 44px rgba(255,79,163,.20);
+    }
+
+    @media (max-width: 520px){
+      header{padding: 18px 10px 10px;}
+      .meta{padding: 14px 14px 16px;}
+      .media{aspect-ratio: 4/3;}
+      .sub{font-size: 13.5px;}
     }
   </style>
 </head>
 
 <body>
-  <div class="floatLayer" aria-hidden="true">
-    <div class="float" style="left:8%; top:14%; color: rgba(255,79,163,.90);">♥</div>
-    <div class="float" style="left:86%; top:18%; color: rgba(255,255,255,.75);">✿</div>
-    <div class="float" style="left:12%; top:72%; color: rgba(255,79,163,.65);">♡</div>
-    <div class="float" style="left:84%; top:80%; color: rgba(255,255,255,.60);">♥</div>
-    <div class="float" style="left:52%; top:10%; color: rgba(255,79,163,.70);">✿</div>
-  </div>
+  <div class="glow" aria-hidden="true"></div>
 
   <main class="wrap">
-    <section class="hero">
-      <h1 class="title">Risky</h1>
+    <header>
+      <div class="kicker"><span class="dot"></span> a small playlist page</div>
+      <h1>Risky</h1>
       <p class="sub">
-        Not “dangerous” risky — just unconventional 😅<br/>
-        We met online, you’re older, and we’re both keeping an open mind. So I made this.
+        Not “danger” risky — just different 😅
+        We met online, you’re older, and we’re both keeping an open mind.
+        So I turned the playlist into a little scroll page.
       </p>
-    </section>
+    </header>
 
-    <section class="grid" id="cards"></section>
+    <section class="stack" id="stack"></section>
 
-    <div class="cta">
+    <div class="footer">
       <a class="btn" id="playlistBtn" href="#" target="_blank" rel="noreferrer">Open the playlist</a>
     </div>
   </main>
 
   <script>
-    // 1) PASTE YOUR PLAYLIST LINK HERE
+    // 1) Replace this with your real playlist link (Apple Music / Spotify / etc.)
     const PLAYLIST_LINK = "https://music.apple.com/ng/playlist/risky/pl.u-GgA5kaVFo44o41Z";
 
-    // 2) Make sure these images exist in your repo in: images/01.jpg ... images/07.jpg
-    const SONGS = [
-  { title:"Salé", artist:"Lojay", img:"images/IMG_5324.jpeg", note:"Pure good mood. No thinking. Just vibes." },
-  { title:"When Will You Be Here", artist:"VHENÉ", img:"images/IMG_5325.jpeg", note:"For the days we’re both busy but still present." },
-  { title:"Girls Deserve More Money", artist:"Majeed", img:"images/IMG_5326.jpeg", note:"Because obviously. And I like your confidence." },
-  { title:"Karat", artist:"Adebaby", img:"images/IMG_5327.jpeg", note:"Soft flex. Clean energy. You-coded." },
-  { title:"DEARLY", artist:"Wande Coal & Qing Madi", img:"images/IMG_5328.jpeg", note:"Warm + sweet. This song is basically sunshine." },
-  { title:"Tenner", artist:"Lojay", img:"images/IMG_5329.jpeg", note:"This is the outside-but-calm soundtrack." },
-  { title:"Risky", artist:"VHENÉ", img:"images/IMG_5330.jpeg", note:"Unconventional… but exciting. That’s the point." }
-];
+    // 2) Your current GitHub images (no renaming needed)
+    const CARDS = [
+      {
+        title: "Salé",
+        artist: "Lojay",
+        img: "images/IMG_5324.jpeg",
+        tag: "good mood",
+        note: "This is for the “no stress, just vibes” moments. Press play and behave."
+      },
+      {
+        title: "When Will You Be Here",
+        artist: "VHENÉ",
+        img: "images/IMG_5325.jpeg",
+        tag: "soft",
+        note: "For when we’re both busy but still somehow… here."
+      },
+      {
+        title: "Girls Deserve More Money",
+        artist: "Majeed",
+        img: "images/IMG_5326.jpeg",
+        tag: "funny + true",
+        note: "Because facts are facts. And you carry yourself like you know it."
+      },
+      {
+        title: "Karat",
+        artist: "Adebaby",
+        img: "images/IMG_5327.jpeg",
+        tag: "clean energy",
+        note: "This one feels like confidence without noise. Simple. Premium."
+      },
+      {
+        title: "DEARLY",
+        artist: "Wande Coal & Qing Madi",
+        img: "images/IMG_5328.jpeg",
+        tag: "warm",
+        note: "This song is basically sunshine. That’s the whole explanation."
+      },
+      {
+        title: "Tenner",
+        artist: "Lojay",
+        img: "images/IMG_5329.jpeg",
+        tag: "outside",
+        note: "For the day we finally hang out and everything is easy."
+      },
+      {
+        title: "Risky",
+        artist: "VHENÉ",
+        img: "images/IMG_5330.jpeg",
+        tag: "the title",
+        note: "Unconventional connection. Open mind. Happy risk. That’s it."
+      }
+    ];
 
     document.getElementById("playlistBtn").href = PLAYLIST_LINK;
-    const cards = document.getElementById("cards");
 
-    SONGS.forEach(s => {
+    const stack = document.getElementById("stack");
+    CARDS.forEach(c => {
       const el = document.createElement("article");
       el.className = "card";
       el.innerHTML = `
-        <img class="img" src="${s.img}" alt="">
-        <div class="pad">
-          <p class="song">${escapeHtml(s.title)}</p>
-          <p class="artist">${escapeHtml(s.artist)}</p>
-          <p class="note">${escapeHtml(s.note)}</p>
+        <img class="media" src="${c.img}" alt="">
+        <div class="meta">
+          <div class="row">
+            <div>
+              <p class="song">${escapeHtml(c.title)}</p>
+              <p class="artist">${escapeHtml(c.artist)}</p>
+            </div>
+            <span class="tag">${escapeHtml(c.tag)}</span>
+          </div>
+          <p class="note">${escapeHtml(c.note)}</p>
         </div>
       `;
-      cards.appendChild(el);
+      stack.appendChild(el);
     });
+
+    // subtle reveal on scroll
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting) e.target.classList.add("show");
+      });
+    }, { threshold: 0.12 });
+    document.querySelectorAll(".card").forEach(c=>io.observe(c));
 
     function escapeHtml(str){
       return String(str ?? "")
