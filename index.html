@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Risky ✿</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --ink:#ffffff;
+      --muted: rgba(255,255,255,.70);
+
+      --bg0:#07060a;
+      --bg1:#120814;
+      --bg2:#1a0b1b;
+
+      --pink:#ff4fa3;
+      --hot:#ff2d8f;
+
+      --glass: rgba(255,255,255,.08);
+      --stroke: rgba(255,255,255,.14);
+      --stroke2: rgba(255,79,163,.18);
+      --shadow: 0 28px 90px rgba(0,0,0,.55);
+
+      --r: 26px;
+      --sans: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      --script: "Great Vibes", cursive;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: var(--sans);
+      color:var(--ink);
+      background:
+        radial-gradient(900px 520px at 18% 18%, rgba(255,79,163,.18), transparent 60%),
+        radial-gradient(760px 620px at 78% 55%, rgba(255,255,255,.08), transparent 66%),
+        linear-gradient(180deg, var(--bg0) 0%, var(--bg1) 45%, var(--bg2) 100%);
+      overflow-x:hidden;
+    }
+
+    .floatLayer{position:fixed; inset:0; pointer-events:none; z-index:0; opacity:.9;}
+    .float{position:absolute; font-size:18px; animation: drift 12s ease-in-out infinite; filter: drop-shadow(0 10px 18px rgba(0,0,0,.35));}
+    .float:nth-child(2){animation-duration:14s}
+    .float:nth-child(3){animation-duration:16s}
+    .float:nth-child(4){animation-duration:13s}
+    .float:nth-child(5){animation-duration:15s}
+    @keyframes drift{0%{transform:translate(0,0) rotate(0)}50%{transform:translate(10px,-14px) rotate(6deg)}100%{transform:translate(0,0) rotate(0)}}
+
+    .wrap{
+      position:relative;
+      z-index:1;
+      width:min(980px, 92vw);
+      margin: 0 auto;
+      padding: 46px 0 72px;
+      display:flex;
+      flex-direction:column;
+      gap: 18px;
+    }
+
+    .hero{
+      background: var(--glass);
+      border: 1px solid var(--stroke2);
+      border-top-color: var(--stroke);
+      border-left-color: var(--stroke);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      padding: 22px 18px;
+      text-align:center;
+    }
+    .title{
+      font-family: var(--script);
+      font-size: clamp(52px, 7vw, 100px);
+      line-height: .92;
+      margin: 0;
+      letter-spacing:.2px;
+    }
+    .sub{
+      margin: 10px auto 0;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 14px;
+      max-width: 60ch;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    @media (max-width: 720px){
+      .grid{grid-template-columns: 1fr;}
+      .wrap{padding: 34px 0 60px;}
+    }
+
+    .card{
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.10);
+      border-top-color: rgba(255,255,255,.16);
+      border-left-color: rgba(255,255,255,.16);
+      border-radius: var(--r);
+      box-shadow: 0 22px 70px rgba(0,0,0,.35);
+      backdrop-filter: blur(18px);
+      overflow:hidden;
+    }
+    .img{
+      width:100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      display:block;
+      background: rgba(255,255,255,.06);
+    }
+    .pad{padding: 14px 14px 16px;}
+    .song{
+      margin:0;
+      font-weight: 600;
+      font-size: 15px;
+      letter-spacing: .1px;
+    }
+    .artist{
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .note{
+      margin: 10px 0 0;
+      color: rgba(255,255,255,.86);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .cta{
+      margin-top: 6px;
+      display:flex;
+      justify-content:center;
+    }
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      height: 48px;
+      padding: 0 18px;
+      border-radius: 14px;
+      background: linear-gradient(180deg, var(--pink), var(--hot));
+      color:#0b0710;
+      text-decoration:none;
+      font-weight: 700;
+      font-size: 14px;
+      box-shadow: 0 18px 44px rgba(255,79,163,.18);
+      border: 1px solid rgba(255,255,255,.18);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="floatLayer" aria-hidden="true">
+    <div class="float" style="left:8%; top:14%; color: rgba(255,79,163,.90);">♥</div>
+    <div class="float" style="left:86%; top:18%; color: rgba(255,255,255,.75);">✿</div>
+    <div class="float" style="left:12%; top:72%; color: rgba(255,79,163,.65);">♡</div>
+    <div class="float" style="left:84%; top:80%; color: rgba(255,255,255,.60);">♥</div>
+    <div class="float" style="left:52%; top:10%; color: rgba(255,79,163,.70);">✿</div>
+  </div>
+
+  <main class="wrap">
+    <section class="hero">
+      <h1 class="title">Risky</h1>
+      <p class="sub">
+        Not “dangerous” risky — just unconventional 😅<br/>
+        We met online, you’re older, and we’re both keeping an open mind. So I made this.
+      </p>
+    </section>
+
+    <section class="grid" id="cards"></section>
+
+    <div class="cta">
+      <a class="btn" id="playlistBtn" href="#" target="_blank" rel="noreferrer">Open the playlist</a>
+    </div>
+  </main>
+
+  <script>
+    // 1) PASTE YOUR PLAYLIST LINK HERE
+    const PLAYLIST_LINK = "https://music.apple.com/ng/playlist/risky/pl.u-GgA5kaVFo44o41Z";
+
+    // 2) Make sure these images exist in your repo in: images/01.jpg ... images/07.jpg
+    const SONGS = [
+  { title:"Salé", artist:"Lojay", img:"images/IMG_5324.jpeg", note:"Pure good mood. No thinking. Just vibes." },
+  { title:"When Will You Be Here", artist:"VHENÉ", img:"images/IMG_5325.jpeg", note:"For the days we’re both busy but still present." },
+  { title:"Girls Deserve More Money", artist:"Majeed", img:"images/IMG_5326.jpeg", note:"Because obviously. And I like your confidence." },
+  { title:"Karat", artist:"Adebaby", img:"images/IMG_5327.jpeg", note:"Soft flex. Clean energy. You-coded." },
+  { title:"DEARLY", artist:"Wande Coal & Qing Madi", img:"images/IMG_5328.jpeg", note:"Warm + sweet. This song is basically sunshine." },
+  { title:"Tenner", artist:"Lojay", img:"images/IMG_5329.jpeg", note:"This is the outside-but-calm soundtrack." },
+  { title:"Risky", artist:"VHENÉ", img:"images/IMG_5330.jpeg", note:"Unconventional… but exciting. That’s the point." }
+];
+
+    document.getElementById("playlistBtn").href = PLAYLIST_LINK;
+    const cards = document.getElementById("cards");
+
+    SONGS.forEach(s => {
+      const el = document.createElement("article");
+      el.className = "card";
+      el.innerHTML = `
+        <img class="img" src="${s.img}" alt="">
+        <div class="pad">
+          <p class="song">${escapeHtml(s.title)}</p>
+          <p class="artist">${escapeHtml(s.artist)}</p>
+          <p class="note">${escapeHtml(s.note)}</p>
+        </div>
+      `;
+      cards.appendChild(el);
+    });
+
+    function escapeHtml(str){
+      return String(str ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+  </script>
+</body>
+</html>
