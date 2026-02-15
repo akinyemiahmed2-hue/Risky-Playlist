@@ -130,6 +130,7 @@
       transform-origin: 50% 90%;
       user-select:none;
       will-change: transform;
+      touch-action: none;
     }
     /* stacked look for cards behind */
     .card[data-depth="1"]{ transform: translateY(10px) rotate(-2deg) scale(.985); opacity:.96; }
@@ -345,21 +346,80 @@
     }
 
     function bindTopCard(){
-      const top = stage.querySelector(".card.is-top");
-      if(!top) return;
+      function bindTopCard(){
+  const top = stage.querySelector(".card.is-top");
+  if(!top) return;
 
-      let startX = 0, startY = 0;
-      let dx = 0, dy = 0;
-      let dragging = false;
+  let startX = 0, startY = 0;
+  let dx = 0, dy = 0;
+  let dragging = false;
 
-      const onDown = (e) => {
-        dragging = true;
-        const p = point(e);
-        startX = p.x; startY = p.y;
-        dx = 0; dy = 0;
-        top.style.transition = "none";
-        window.addEventListener("pointermove", onMove, {passive:false});
-        window.addEventListener("pointerup", onUp, {passive:true});
+  const start = (x,y) => {
+    dragging = true;
+    startX = x; startY = y;
+    dx = 0; dy = 0;
+    top.style.transition = "none";
+  };
+
+  const move = (x,y) => {
+    if(!dragging) return;
+    dx = x - startX;
+    dy = y - startY;
+
+    const rot = clamp(dx / 18, -18, 18);
+    top.style.transform = `translate(${dx}px, ${dy}px) rotate(${rot}deg)`;
+
+    const next = stage.querySelectorAll(".card")[1];
+    if(next){
+      const lift = Math.min(Math.abs(dx) / 20, 10);
+      next.style.transition = "transform .2s ease, opacity .2s ease";
+      const depth = Number(next.dataset.depth || 1);
+      next.style.transform = `translateY(${Math.max(0, depth*8 - lift)}px) rotate(${depth%2? -2:2}deg) scale(${1 - depth*0.012 + lift*0.001})`;
+      next.style.opacity = String(0.96 - depth*0.03 + lift*0.002);
+    }
+  };
+
+  const end = () => {
+    if(!dragging) return;
+    dragging = false;
+
+    const throwX = Math.abs(dx) > 110;
+    if(throwX){
+      dismiss(top, dx);
+    }else{
+      top.style.transition = "transform .28s ease";
+      top.style.transform = "";
+      applyDepthTransforms();
+    }
+  };
+
+  // Pointer (works on most modern browsers)
+  top.addEventListener("pointerdown", (e) => {
+    start(e.clientX, e.clientY);
+    const onMove = (ev) => move(ev.clientX, ev.clientY);
+    const onUp = () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      end();
+    };
+    window.addEventListener("pointermove", onMove, {passive:false});
+    window.addEventListener("pointerup", onUp, {passive:true});
+  });
+
+  // Touch fallback (reliable on iPhone Safari)
+  top.addEventListener("touchstart", (e) => {
+    const t = e.touches[0];
+    start(t.clientX, t.clientY);
+  }, {passive:true});
+
+  top.addEventListener("touchmove", (e) => {
+    e.preventDefault();
+    const t = e.touches[0];
+    move(t.clientX, t.clientY);
+  }, {passive:false});
+
+  top.addEventListener("touchend", () => end(), {passive:true});
+}
       };
 
       const onMove = (e) => {
