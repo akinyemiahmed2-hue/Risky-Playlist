@@ -23,7 +23,6 @@
       --paper2:#ffffff;
       --paperInk:#120b12;
 
-      --shadow: 0 28px 90px rgba(0,0,0,.55);
       --shadow2: 0 18px 50px rgba(0,0,0,.35);
 
       --sans: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial;
@@ -41,6 +40,9 @@
         radial-gradient(820px 560px at 82% 40%, rgba(255,255,255,.07), transparent 66%),
         linear-gradient(180deg, var(--bg0), var(--bg1));
       overflow:hidden;
+      -webkit-user-select:none;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
     }
 
     .glow{
@@ -72,7 +74,6 @@
       width:min(920px, 94vw);
       text-align:center;
       margin-top: 8px;
-      user-select:none;
     }
     .kicker{
       display:inline-flex;
@@ -113,7 +114,10 @@
       place-items:center;
       position:relative;
       margin-top: 6px;
+
+      /* CRUCIAL for iPhone */
       touch-action: none;
+      overscroll-behavior: none;
     }
 
     .card{
@@ -125,9 +129,8 @@
       color: var(--paperInk);
       padding: 14px 14px 16px;
       transform-origin: 50% 90%;
-      user-select:none;
       will-change: transform, opacity;
-      touch-action: none; /* IMPORTANT for iPhone */
+      touch-action: none;
     }
 
     .card[data-depth="1"]{ transform: translateY(10px) rotate(-2deg) scale(.985); opacity:.96; }
@@ -148,6 +151,9 @@
       height:100%;
       object-fit:cover;
       display:block;
+
+      /* IMPORTANT: let the card receive the swipe */
+      pointer-events:none;
     }
 
     .meta{
@@ -163,24 +169,9 @@
       gap: 10px;
       flex-wrap:wrap;
     }
-    .song{
-      margin:0;
-      font-weight: 800;
-      font-size: 15px;
-      letter-spacing:.1px;
-    }
-    .artist{
-      margin:0;
-      font-size: 12.5px;
-      color: rgba(18,11,18,.70);
-      font-weight: 600;
-    }
-    .note{
-      margin:0;
-      font-size: 13.5px;
-      line-height: 1.55;
-      color: rgba(18,11,18,.86);
-    }
+    .song{ margin:0; font-weight: 900; font-size: 15px; letter-spacing:.1px; }
+    .artist{ margin:0; font-size: 12.5px; color: rgba(18,11,18,.70); font-weight: 600; }
+    .note{ margin:0; font-size: 13.5px; line-height: 1.55; color: rgba(18,11,18,.86); }
     .tag{
       font-size: 12px;
       padding: 7px 10px;
@@ -188,7 +179,7 @@
       background: rgba(255,79,163,.10);
       border: 1px solid rgba(255,79,163,.20);
       color: rgba(18,11,18,.78);
-      font-weight: 800;
+      font-weight: 900;
     }
 
     .hint{
@@ -196,7 +187,6 @@
       text-align:center;
       color: rgba(255,255,255,.68);
       font-size: 12px;
-      user-select:none;
     }
 
     .reveal{
@@ -230,9 +220,6 @@
       box-shadow: 0 18px 44px rgba(255,79,163,.20);
     }
 
-    .card.is-top{ cursor: grab; }
-    .card.is-top:active{ cursor: grabbing; }
-
     @media (max-width: 420px){
       .stage{ height: min(64vh, 620px); }
       .note{ font-size: 13px; }
@@ -250,7 +237,7 @@
       <p class="sub">A small swipe page for the playlist. Nothing heavy. Just a vibe.</p>
     </header>
 
-    <section class="stage" id="stage" aria-label="Swipe cards"></section>
+    <section class="stage" id="stage"></section>
 
     <div class="hint" id="hint">Tip: swipe left or right ✨</div>
 
@@ -278,20 +265,26 @@
     const playlistBtn = document.getElementById("playlistBtn");
     playlistBtn.href = PLAYLIST_LINK;
 
-    let stack = CARDS.map((c, i) => ({...c, id: i}));
+    let stack = CARDS.map((c, i) => ({...c, id:i}));
+
+    // drag state (handled on STAGE, not card)
+    let dragging = false;
+    let startX = 0, startY = 0;
+    let dx = 0, dy = 0;
+
     render();
+    bindStageGestures();
 
     function render(){
       stage.innerHTML = "";
-
       const topN = stack.slice(0, 5);
+
       topN.forEach((c, idx) => {
         const depth = Math.min(idx, 4);
         const el = document.createElement("article");
         el.className = "card";
-        el.dataset.id = c.id;
         el.dataset.depth = depth;
-        if(idx === 0) el.classList.add("is-top");
+        if(idx === 0) el.dataset.top = "1";
 
         el.innerHTML = `
           <div class="photo"><img src="${c.img}" alt=""></div>
@@ -315,97 +308,88 @@
       }else{
         reveal.classList.remove("show");
       }
-
-      applyDepthTransforms();
-      bindTopCard();
     }
 
-    function applyDepthTransforms(){
-      const cards = [...stage.querySelectorAll(".card")];
-      cards.forEach((el, idx)=>{
-        el.dataset.depth = Math.min(idx, 4);
-        el.classList.toggle("is-top", idx === 0);
-      });
+    function topCard(){
+      return stage.querySelector('.card[data-top="1"]') || stage.querySelector(".card");
     }
 
-    function bindTopCard(){
-      const top = stage.querySelector(".card.is-top");
-      if(!top) return;
-
-      let startX = 0, startY = 0;
-      let dx = 0, dy = 0;
-      let dragging = false;
-
-      const start = (x,y) => {
-        dragging = true;
-        startX = x; startY = y;
-        dx = 0; dy = 0;
-        top.style.transition = "none";
-      };
-
-      const move = (x,y) => {
-        if(!dragging) return;
-        dx = x - startX;
-        dy = y - startY;
-
-        const rot = clamp(dx / 18, -18, 18);
-        top.style.transform = `translate(${dx}px, ${dy}px) rotate(${rot}deg)`;
-
-        const next = stage.querySelectorAll(".card")[1];
-        if(next){
-          const lift = Math.min(Math.abs(dx) / 20, 10);
-          next.style.transition = "transform .2s ease, opacity .2s ease";
-          const depth = Number(next.dataset.depth || 1);
-          next.style.transform = `translateY(${Math.max(0, depth*8 - lift)}px) rotate(${depth%2? -2:2}deg) scale(${1 - depth*0.012 + lift*0.001})`;
-          next.style.opacity = String(0.96 - depth*0.03 + lift*0.002);
-        }
-      };
-
-      const end = () => {
-        if(!dragging) return;
-        dragging = false;
-
-        const throwX = Math.abs(dx) > 110;
-        if(throwX){
-          dismiss(top, dx);
-        }else{
-          top.style.transition = "transform .28s ease";
-          top.style.transform = "";
-          applyDepthTransforms();
-        }
-      };
-
-      // Pointer events
-      top.addEventListener("pointerdown", (e) => {
-        start(e.clientX, e.clientY);
-
-        const onMove = (ev) => {
-          ev.preventDefault?.();
-          move(ev.clientX, ev.clientY);
-        };
-        const onUp = () => {
-          window.removeEventListener("pointermove", onMove);
-          window.removeEventListener("pointerup", onUp);
-          end();
-        };
-
-        window.addEventListener("pointermove", onMove, {passive:false});
-        window.addEventListener("pointerup", onUp, {passive:true});
-      }, {passive:true});
-
-      // Touch fallback (iPhone reliable)
-      top.addEventListener("touchstart", (e) => {
+    function bindStageGestures(){
+      // Touch (iPhone reliable)
+      stage.addEventListener("touchstart", (e) => {
+        if(!topCard()) return;
         const t = e.touches[0];
-        start(t.clientX, t.clientY);
+        dragging = true;
+        startX = t.clientX; startY = t.clientY;
+        dx = 0; dy = 0;
+        const top = topCard();
+        top.style.transition = "none";
       }, {passive:true});
 
-      top.addEventListener("touchmove", (e) => {
+      stage.addEventListener("touchmove", (e) => {
+        if(!dragging) return;
         e.preventDefault();
         const t = e.touches[0];
-        move(t.clientX, t.clientY);
+        moveTo(t.clientX, t.clientY);
       }, {passive:false});
 
-      top.addEventListener("touchend", () => end(), {passive:true});
+      stage.addEventListener("touchend", () => endDrag(), {passive:true});
+
+      // Pointer (desktop + some mobile browsers)
+      stage.addEventListener("pointerdown", (e) => {
+        if(!topCard()) return;
+        dragging = true;
+        startX = e.clientX; startY = e.clientY;
+        dx = 0; dy = 0;
+        const top = topCard();
+        top.style.transition = "none";
+      }, {passive:true});
+
+      stage.addEventListener("pointermove", (e) => {
+        if(!dragging) return;
+        e.preventDefault?.();
+        moveTo(e.clientX, e.clientY);
+      }, {passive:false});
+
+      stage.addEventListener("pointerup", () => endDrag(), {passive:true});
+      stage.addEventListener("pointercancel", () => endDrag(), {passive:true});
+    }
+
+    function moveTo(x,y){
+      const top = topCard();
+      if(!top) return;
+
+      dx = x - startX;
+      dy = y - startY;
+
+      const rot = clamp(dx / 18, -18, 18);
+      top.style.transform = `translate(${dx}px, ${dy}px) rotate(${rot}deg)`;
+
+      // nudge next card a bit
+      const next = stage.querySelectorAll(".card")[1];
+      if(next){
+        const lift = Math.min(Math.abs(dx) / 20, 10);
+        next.style.transition = "transform .2s ease, opacity .2s ease";
+        const depth = Number(next.dataset.depth || 1);
+        next.style.transform = `translateY(${Math.max(0, depth*8 - lift)}px) rotate(${depth%2? -2:2}deg) scale(${1 - depth*0.012 + lift*0.001})`;
+        next.style.opacity = String(0.96 - depth*0.03 + lift*0.002);
+      }
+    }
+
+    function endDrag(){
+      if(!dragging) return;
+      dragging = false;
+
+      const top = topCard();
+      if(!top) return;
+
+      const throwX = Math.abs(dx) > 110;
+      if(throwX){
+        dismiss(top, dx);
+      }else{
+        top.style.transition = "transform .28s ease";
+        top.style.transform = "";
+      }
     }
 
     function dismiss(cardEl, dx){
