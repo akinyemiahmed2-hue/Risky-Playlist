@@ -43,7 +43,6 @@
       overflow:hidden;
     }
 
-    /* soft living glow */
     .glow{
       position:fixed; inset:-25%;
       background:
@@ -107,7 +106,6 @@
       line-height: 1.6;
     }
 
-    /* Stack area */
     .stage{
       width:min(880px, 94vw);
       height: min(66vh, 640px);
@@ -115,10 +113,9 @@
       place-items:center;
       position:relative;
       margin-top: 6px;
-      touch-action: none; /* we handle drag ourselves */
+      touch-action: none;
     }
 
-    /* Polaroid card */
     .card{
       position:absolute;
       width: min(420px, 86vw);
@@ -129,10 +126,10 @@
       padding: 14px 14px 16px;
       transform-origin: 50% 90%;
       user-select:none;
-      will-change: transform;
-      touch-action: none;
+      will-change: transform, opacity;
+      touch-action: none; /* IMPORTANT for iPhone */
     }
-    /* stacked look for cards behind */
+
     .card[data-depth="1"]{ transform: translateY(10px) rotate(-2deg) scale(.985); opacity:.96; }
     .card[data-depth="2"]{ transform: translateY(18px) rotate(2deg) scale(.97); opacity:.92; }
     .card[data-depth="3"]{ transform: translateY(26px) rotate(-1deg) scale(.955); opacity:.88; }
@@ -168,7 +165,7 @@
     }
     .song{
       margin:0;
-      font-weight: 700;
+      font-weight: 800;
       font-size: 15px;
       letter-spacing:.1px;
     }
@@ -191,10 +188,9 @@
       background: rgba(255,79,163,.10);
       border: 1px solid rgba(255,79,163,.20);
       color: rgba(18,11,18,.78);
-      font-weight: 700;
+      font-weight: 800;
     }
 
-    /* swipe hint */
     .hint{
       width:min(880px, 94vw);
       text-align:center;
@@ -203,7 +199,6 @@
       user-select:none;
     }
 
-    /* Playlist reveal */
     .reveal{
       width:min(880px, 94vw);
       display:flex;
@@ -229,21 +224,15 @@
       background: linear-gradient(180deg, var(--pink), var(--pink2));
       color:#0b0710;
       text-decoration:none;
-      font-weight: 800;
+      font-weight: 900;
       font-size: 14px;
       border: 1px solid rgba(255,255,255,.18);
       box-shadow: 0 18px 44px rgba(255,79,163,.20);
     }
 
-    /* drag visuals for top card */
-    .card.is-top{
-      cursor: grab;
-    }
-    .card.is-top:active{
-      cursor: grabbing;
-    }
+    .card.is-top{ cursor: grab; }
+    .card.is-top:active{ cursor: grabbing; }
 
-    /* small screens */
     @media (max-width: 420px){
       .stage{ height: min(64vh, 620px); }
       .note{ font-size: 13px; }
@@ -258,10 +247,7 @@
     <header>
       <div class="kicker"><span class="dot"></span> swipe through</div>
       <h1>Risky</h1>
-      <p class="sub">
-        Not “danger” risky — just different 😅
-        A small playlist page you can swipe through.
-      </p>
+      <p class="sub">A small swipe page for the playlist. Nothing heavy. Just a vibe.</p>
     </header>
 
     <section class="stage" id="stage" aria-label="Swipe cards"></section>
@@ -274,10 +260,8 @@
   </div>
 
   <script>
-    // Paste your playlist link here:
     const PLAYLIST_LINK = "PASTE_YOUR_PLAYLIST_LINK_HERE";
 
-    // Your cards (edit copy freely, keep it short):
     const CARDS = [
       { title:"Salé", artist:"Lojay", tag:"good mood", img:"images/IMG_5324.jpeg", note:"No stress. Just vibes." },
       { title:"When Will You Be Here", artist:"VHENÉ", tag:"soft", img:"images/IMG_5325.jpeg", note:"Busy days, still present." },
@@ -294,13 +278,13 @@
     const playlistBtn = document.getElementById("playlistBtn");
     playlistBtn.href = PLAYLIST_LINK;
 
-    // Build stack (last card at bottom)
     let stack = CARDS.map((c, i) => ({...c, id: i}));
     render();
 
     function render(){
       stage.innerHTML = "";
-      const topN = stack.slice(0, 5); // render top 5 for performance
+
+      const topN = stack.slice(0, 5);
       topN.forEach((c, idx) => {
         const depth = Math.min(idx, 4);
         const el = document.createElement("article");
@@ -332,12 +316,11 @@
         reveal.classList.remove("show");
       }
 
-      bindTopCard();
       applyDepthTransforms();
+      bindTopCard();
     }
 
     function applyDepthTransforms(){
-      // Re-apply depth attributes to visible cards
       const cards = [...stage.querySelectorAll(".card")];
       cards.forEach((el, idx)=>{
         el.dataset.depth = Math.min(idx, 4);
@@ -346,122 +329,83 @@
     }
 
     function bindTopCard(){
-      function bindTopCard(){
-  const top = stage.querySelector(".card.is-top");
-  if(!top) return;
+      const top = stage.querySelector(".card.is-top");
+      if(!top) return;
 
-  let startX = 0, startY = 0;
-  let dx = 0, dy = 0;
-  let dragging = false;
+      let startX = 0, startY = 0;
+      let dx = 0, dy = 0;
+      let dragging = false;
 
-  const start = (x,y) => {
-    dragging = true;
-    startX = x; startY = y;
-    dx = 0; dy = 0;
-    top.style.transition = "none";
-  };
-
-  const move = (x,y) => {
-    if(!dragging) return;
-    dx = x - startX;
-    dy = y - startY;
-
-    const rot = clamp(dx / 18, -18, 18);
-    top.style.transform = `translate(${dx}px, ${dy}px) rotate(${rot}deg)`;
-
-    const next = stage.querySelectorAll(".card")[1];
-    if(next){
-      const lift = Math.min(Math.abs(dx) / 20, 10);
-      next.style.transition = "transform .2s ease, opacity .2s ease";
-      const depth = Number(next.dataset.depth || 1);
-      next.style.transform = `translateY(${Math.max(0, depth*8 - lift)}px) rotate(${depth%2? -2:2}deg) scale(${1 - depth*0.012 + lift*0.001})`;
-      next.style.opacity = String(0.96 - depth*0.03 + lift*0.002);
-    }
-  };
-
-  const end = () => {
-    if(!dragging) return;
-    dragging = false;
-
-    const throwX = Math.abs(dx) > 110;
-    if(throwX){
-      dismiss(top, dx);
-    }else{
-      top.style.transition = "transform .28s ease";
-      top.style.transform = "";
-      applyDepthTransforms();
-    }
-  };
-
-  // Pointer (works on most modern browsers)
-  top.addEventListener("pointerdown", (e) => {
-    start(e.clientX, e.clientY);
-    const onMove = (ev) => move(ev.clientX, ev.clientY);
-    const onUp = () => {
-      window.removeEventListener("pointermove", onMove);
-      window.removeEventListener("pointerup", onUp);
-      end();
-    };
-    window.addEventListener("pointermove", onMove, {passive:false});
-    window.addEventListener("pointerup", onUp, {passive:true});
-  });
-
-  // Touch fallback (reliable on iPhone Safari)
-  top.addEventListener("touchstart", (e) => {
-    const t = e.touches[0];
-    start(t.clientX, t.clientY);
-  }, {passive:true});
-
-  top.addEventListener("touchmove", (e) => {
-    e.preventDefault();
-    const t = e.touches[0];
-    move(t.clientX, t.clientY);
-  }, {passive:false});
-
-  top.addEventListener("touchend", () => end(), {passive:true});
-}
+      const start = (x,y) => {
+        dragging = true;
+        startX = x; startY = y;
+        dx = 0; dy = 0;
+        top.style.transition = "none";
       };
 
-      const onMove = (e) => {
+      const move = (x,y) => {
         if(!dragging) return;
-        e.preventDefault();
-        const p = point(e);
-        dx = p.x - startX;
-        dy = p.y - startY;
+        dx = x - startX;
+        dy = y - startY;
 
         const rot = clamp(dx / 18, -18, 18);
         top.style.transform = `translate(${dx}px, ${dy}px) rotate(${rot}deg)`;
 
-        // subtle push for next card
         const next = stage.querySelectorAll(".card")[1];
         if(next){
           const lift = Math.min(Math.abs(dx) / 20, 10);
           next.style.transition = "transform .2s ease, opacity .2s ease";
-          // gently pull it forward by reducing its Y translate
           const depth = Number(next.dataset.depth || 1);
           next.style.transform = `translateY(${Math.max(0, depth*8 - lift)}px) rotate(${depth%2? -2:2}deg) scale(${1 - depth*0.012 + lift*0.001})`;
           next.style.opacity = String(0.96 - depth*0.03 + lift*0.002);
         }
       };
 
-      const onUp = () => {
+      const end = () => {
+        if(!dragging) return;
         dragging = false;
-        window.removeEventListener("pointermove", onMove);
-        window.removeEventListener("pointerup", onUp);
 
-        const throwX = Math.abs(dx) > 110; // threshold
+        const throwX = Math.abs(dx) > 110;
         if(throwX){
           dismiss(top, dx);
         }else{
-          // snap back
           top.style.transition = "transform .28s ease";
           top.style.transform = "";
-          // reset others
           applyDepthTransforms();
         }
       };
 
-      top.addEventListener("pointerdown", onDown, {passive:true});
+      // Pointer events
+      top.addEventListener("pointerdown", (e) => {
+        start(e.clientX, e.clientY);
+
+        const onMove = (ev) => {
+          ev.preventDefault?.();
+          move(ev.clientX, ev.clientY);
+        };
+        const onUp = () => {
+          window.removeEventListener("pointermove", onMove);
+          window.removeEventListener("pointerup", onUp);
+          end();
+        };
+
+        window.addEventListener("pointermove", onMove, {passive:false});
+        window.addEventListener("pointerup", onUp, {passive:true});
+      }, {passive:true});
+
+      // Touch fallback (iPhone reliable)
+      top.addEventListener("touchstart", (e) => {
+        const t = e.touches[0];
+        start(t.clientX, t.clientY);
+      }, {passive:true});
+
+      top.addEventListener("touchmove", (e) => {
+        e.preventDefault();
+        const t = e.touches[0];
+        move(t.clientX, t.clientY);
+      }, {passive:false});
+
+      top.addEventListener("touchend", () => end(), {passive:true});
     }
 
     function dismiss(cardEl, dx){
@@ -473,7 +417,6 @@
       cardEl.style.transform = `translate(${outX}px, ${outY}px) rotate(${rot}deg)`;
       cardEl.style.opacity = "0";
 
-      // remove from stack after animation
       setTimeout(()=>{
         stack.shift();
         if(stack.length === 0){
@@ -486,9 +429,6 @@
       }, 360);
     }
 
-    function point(e){
-      return { x: e.clientX, y: e.clientY };
-    }
     function clamp(n,min,max){ return Math.max(min, Math.min(max,n)); }
     function escapeHtml(str){
       return String(str ?? "")
